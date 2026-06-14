@@ -16,83 +16,47 @@ function isLensReady(url) {
   return Boolean(url) && !url.includes('YOUR_LENS_URL')
 }
 
-function setStatus(message, isError = false) {
-  const statusEl = document.querySelector('#status')
-  if (!statusEl) return
-  statusEl.textContent = message
-  statusEl.classList.toggle('text-red-400', isError)
-  statusEl.classList.toggle('text-white/70', !isError)
-  statusEl.classList.toggle('hidden', !message)
-}
-
-function setActiveLensButton(index) {
-  document.querySelectorAll('[data-lens-index]').forEach((button) => {
-    const isActive = Number(button.dataset.lensIndex) === index
-    button.classList.toggle('ring-2', isActive)
-    button.classList.toggle('ring-yellow-400', isActive)
-    button.classList.toggle('bg-white/20', isActive)
-    button.classList.toggle('bg-white/10', !isActive)
-  })
+function openLens(index) {
+  const lens = LENS_CONFIG[index]
+  if (!isLensReady(lens.url)) return
+  window.open(lens.url, '_blank', 'noopener,noreferrer')
 }
 
 function renderUI() {
   document.querySelector('#app').innerHTML = `
-    <div class="min-h-screen bg-black text-white flex flex-col">
-      <div class="flex-1 relative overflow-hidden">
-        <iframe
-          id="lens-frame"
-          title="Snapchat Lens"
-          class="absolute inset-0 h-full w-full border-0"
-          allow="camera; microphone; fullscreen; autoplay; xr-spatial-tracking"
-          allowfullscreen
-        ></iframe>
-        <p id="status" class="absolute top-4 left-1/2 -translate-x-1/2 z-10 text-sm text-white/70 px-4 text-center hidden"></p>
-      </div>
-      <div class="flex gap-3 p-4 justify-center bg-black/80 border-t border-white/10">
-        ${LENS_CONFIG.map(
-          (lens, index) => `
-            <button
-              type="button"
-              data-lens-index="${index}"
-              class="px-5 py-2.5 rounded-full text-sm font-medium transition-colors bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
-              ${isLensReady(lens.url) ? '' : 'disabled'}
-            >
-              ${lens.label}
-            </button>
-          `,
-        ).join('')}
+    <div class="min-h-screen bg-black text-white flex flex-col items-center justify-center px-6">
+      <div class="max-w-md w-full text-center space-y-8">
+        <div class="space-y-2">
+          <h1 class="text-2xl font-semibold">3D Fiit Camera</h1>
+          <p class="text-sm text-white/60">
+            Choose a lens to open the WebAR experience in a new tab.
+          </p>
+        </div>
+        <div class="flex flex-col gap-3">
+          ${LENS_CONFIG.map(
+            (lens, index) => `
+              <button
+                type="button"
+                data-lens-index="${index}"
+                class="w-full px-6 py-4 rounded-2xl text-base font-medium transition-colors bg-white/10 hover:bg-white/20 disabled:opacity-40 disabled:cursor-not-allowed"
+                ${isLensReady(lens.url) ? '' : 'disabled'}
+              >
+                ${lens.label}${isLensReady(lens.url) ? '' : ' (coming soon)'}
+              </button>
+            `,
+          ).join('')}
+        </div>
       </div>
     </div>
   `
 }
 
-function loadLens(index) {
-  const lens = LENS_CONFIG[index]
-  if (!isLensReady(lens.url)) {
-    setStatus(`${lens.label} is not ready yet.`, true)
-    return
-  }
-
-  const frame = document.querySelector('#lens-frame')
-  frame.src = lens.url
-  setActiveLensButton(index)
-  setStatus('')
-}
-
 function main() {
   renderUI()
 
-  const readyLensIndex = LENS_CONFIG.findIndex((lens) => isLensReady(lens.url))
-  if (readyLensIndex === -1) {
-    setStatus('Add at least one lens URL to get started.', true)
-    return
-  }
-
-  loadLens(readyLensIndex)
-
   document.querySelectorAll('[data-lens-index]').forEach((button) => {
     button.addEventListener('click', () => {
-      loadLens(Number(button.dataset.lensIndex))
+      openLens(Number(button.dataset.lensIndex))
     })
   })
 }
