@@ -4,7 +4,7 @@ const LENS_URL_1 =
   'https://lens.snap.com/experience/0ed75989-7359-44d8-bf56-b295031c34db'
 const LENS_URL_2 =
   'https://lens.snap.com/experience/368b0d4e-38d8-434f-8f9a-d14c7e941dcf'
-const LENS_URL_3 = 'YOUR_LENS_URL_3'
+const LENS_URL_3 = 'https://lens.snap.com/experience/a975f5d5-6e8b-44d1-9609-3a33bd92fc13'
 
 const LENS_CONFIG = [
   { url: LENS_URL_1, label: 'Lens 1' },
